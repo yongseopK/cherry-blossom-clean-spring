@@ -48,7 +48,6 @@ public class MemberController {
 
   @PostMapping("/login")
   public ResponseEntity<?> login(@Validated @RequestBody MemberSignInRequestDTO dto) {
-    log.info("로그인 접근함");
     try {
       MemberSignInResponseDTO responseDTO = memberService.authenticate(dto);
       return ResponseEntity.ok().body(responseDTO);
@@ -59,7 +58,7 @@ public class MemberController {
     }
   }
 
-  @GetMapping("check")
+  @GetMapping("/check")
   public ResponseEntity<?> checkEmail(String email) {
     try {
       boolean flag = memberService.isDuplicateEmail(email);
