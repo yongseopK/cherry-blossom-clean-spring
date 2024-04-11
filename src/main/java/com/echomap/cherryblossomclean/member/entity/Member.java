@@ -15,8 +15,8 @@ import static com.echomap.cherryblossomclean.member.entity.Member.Role.COMMON;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "tbl_member")
 @ToString
+@Table(name = "tbl_member")
 public class Member {
 
     @Id

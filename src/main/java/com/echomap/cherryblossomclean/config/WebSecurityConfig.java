@@ -31,6 +31,7 @@ public class WebSecurityConfig {
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(
             authorize -> authorize.requestMatchers("/api/members/**").permitAll())
+        .authorizeHttpRequests(authorize -> authorize.requestMatchers("/api/maps/**").permitAll())
         .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated());
 
     http.addFilterAfter(jwtAuthFilter, CorsFilter.class);
