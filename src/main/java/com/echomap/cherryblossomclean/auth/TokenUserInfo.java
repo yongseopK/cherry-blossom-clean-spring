@@ -7,7 +7,7 @@ import static com.echomap.cherryblossomclean.member.entity.Member.*;
 
 @Setter
 @Getter
-@ToString
+@ToString(of = {"email", "role"})
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode

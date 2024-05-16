@@ -83,22 +83,21 @@ public class GarbageCanService {
     List<GarbageCan> garbageCans = garbageCanRepository.findAll();
 
     for (GarbageCan garbageCan : garbageCans) {
-      if (!garbageCan.getDistrict().equals("동작구")) {
+      if (!garbageCan.getDistrict().equals("용산구")) {
         continue;
       }
 
       String address = "";
 
-      if (garbageCan.getDistrict().equals("동작구")) {
-        address = garbageCan.getLoadName() + " " + garbageCan.getLocation();
+        address = garbageCan.getLoadName() ;
+                //+ " " + garbageCan.getLocation();
         System.out.println("address : " + address);
-      }
 
-      try {
+        try {
         String finalAddress = address;
         String responseBody;
 
-        if (garbageCan.getDistrict().equals("동작구")) {
+        if (garbageCan.getDistrict().equals("용산구")) {
           // Naver Map Geocoding API 요청
           responseBody =
               webClient
@@ -145,7 +144,7 @@ public class GarbageCanService {
 
         // 응답 데이터에서 위도, 경도 추출
         JsonNode itemNode;
-        if (garbageCan.getDistrict().equals("동작구")) {
+        if (garbageCan.getDistrict().equals("용산구")) {
           itemNode = rootNode.path("addresses").get(0);
         } else {
           itemNode = rootNode.path("items").get(0);
@@ -154,10 +153,10 @@ public class GarbageCanService {
         if (itemNode != null) {
           double latitude =
               Double.parseDouble(
-                  itemNode.path(garbageCan.getDistrict().equals("동작구") ? "y" : "mapy").asText());
+                  itemNode.path(garbageCan.getDistrict().equals("용산구") ? "y" : "mapy").asText());
           double longitude =
               Double.parseDouble(
-                  itemNode.path(garbageCan.getDistrict().equals("동작구") ? "x" : "mapx").asText());
+                  itemNode.path(garbageCan.getDistrict().equals("용산구") ? "x" : "mapx").asText());
 
           garbageCan.setLatitude(latitude);
           garbageCan.setLongitude(longitude);
