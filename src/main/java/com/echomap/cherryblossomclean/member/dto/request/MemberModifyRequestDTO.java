@@ -1,6 +1,7 @@
 package com.echomap.cherryblossomclean.member.dto.request;
 
 import com.echomap.cherryblossomclean.member.entity.Member;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -13,40 +14,28 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Schema(description = "정보수정 요청 DTO")
 public class MemberModifyRequestDTO {
 
-    private String email;
-
+    @Schema(description = "수정 비밀번호", example = "test1234!")
     private String password;
 
+    @Schema(description = "회원 이름", example = "홍길동")
     private String userName;
-
-    private LocalDateTime joinDate;
-
-    public MemberModifyRequestDTO(Member member) {
-        this.email = member.getEmail();
-        this.password = member.getPassword();
-        this.userName = member.getUserName();
-        this.joinDate = member.getJoinDate();
-    }
 
     // 비밀번호를 수정할때 재인코딩해서 엔터티화
     public Member toEntity(PasswordEncoder passwordEncoder) {
         return Member.builder()
-                .email(this.email)
                 .password(passwordEncoder.encode(this.password))
                 .userName(this.userName)
-                .joinDate(this.joinDate)
                 .build();
     }
 
     // 비밀번호를 수정하지 않을때 원래의 비밀번호로 덮어쓰기위함
     public Member toEntity() {
         return Member.builder()
-                .email(this.email)
                 .password(this.password)
                 .userName(this.userName)
-                .joinDate(this.joinDate)
                 .build();
     }
 }
