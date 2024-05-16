@@ -2,6 +2,8 @@ package com.echomap.cherryblossomclean.filter;
 
 import com.echomap.cherryblossomclean.auth.TokenProvider;
 import com.echomap.cherryblossomclean.auth.TokenUserInfo;
+import com.echomap.cherryblossomclean.exception.TokenExpiredException;
+import com.echomap.cherryblossomclean.exception.TokenInvalidException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,34 +32,44 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
   @Override
   protected void doFilterInternal(
-      HttpServletRequest request,
-      HttpServletResponse response,
-      FilterChain filterChain)
-      throws ServletException, IOException {
+          HttpServletRequest request,
+          HttpServletResponse response,
+          FilterChain filterChain)
+          throws ServletException, IOException {
 
     try {
       String token = parseBearerToken(request);
+      //log.info("token : {}", token);
 
-      if(token != null) {
+      if (token != null) {
         TokenUserInfo userInfo = tokenProvider.validateAndGetTokenUserInfo(token);
 
-        List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
+        if (userInfo != null) {
+          List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
+          authorityList.add(new SimpleGrantedAuthority(userInfo.getRole().toString()));
 
-        authorityList.add(new SimpleGrantedAuthority(userInfo.getRole().toString()));
+          AbstractAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                  userInfo,
+                  null,
+                  authorityList
+          );
 
-        AbstractAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                userInfo,
-                null,
-                authorityList
-        );
-
-        auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-        SecurityContextHolder.getContext().setAuthentication(auth);
+          auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+          SecurityContextHolder.getContext().setAuthentication(auth);
+        } else {
+          log.warn("토큰이 유효하지 않습니다.");
+          response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
+        }
       }
-    } catch (Exception e) {
-      log.warn(e.getMessage());
-      log.warn("토큰이 위조되었습니다.");
+    } catch (TokenExpiredException ex) {
+      log.warn("토큰이 만료되었습니다.", ex);
+      response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token expired");
+    } catch (TokenInvalidException ex) {
+      log.warn("토큰이 유효하지 않습니다.", ex);
+      response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
+    } catch (Exception ex) {
+      log.error("예기치 않은 예외가 발생했습니다.", ex);
+      response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An unexpected error occurred");
     }
 
     filterChain.doFilter(request, response);
