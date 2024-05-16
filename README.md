@@ -6,15 +6,13 @@
     - 회원기능
         - 로그인
         - 회원가입
-        - 비밀번호 찾기
-        - SNS(소셜) 로그인
+        - 임시 비밀번호 발급
+        - SNS(네이버, 구글) 로그인
     - 지도
         - 쓰레기통의 위치를 마커로 표시
             - 공공데이터포털의 지역구별 “쓰레기통설치현황” 정보를 기반으로 위치정보 획득
         - 지역별 섹터를 나누어 꽃의 예상 개화시기를 알려줌
             - 인터넷 검색을 통한 정보 취합 후 신뢰성 높은 정보를 채택
-        - 사용자가 선택한 위치의 날씨 표기
-            - 카카오맵 or 네이버 지도 API 사용예정
     - 관리자 페이지
         - 회원관리
         - 쓰레기통, 꽃 개화시기 제보 수렴
@@ -27,7 +25,7 @@
 
 - 기술 스택
     - Backend : Spring Boot(3.x.x), Java 17, open JDK 17
-    - Frontend : React, Flutter(Optianal)
+    - Frontend : React 18
     - Bundling tool : vite
     - DB & ORM : MariaDB, Spring JPA
     - Version Control : Git, GitHub
