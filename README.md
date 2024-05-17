@@ -23,11 +23,41 @@
     - 백엔드 엔드포인트 및 비즈니스 로직 제작 (14일)
     - 테스트 및 디버그, 배포 (7일)
 
-- 기술 스택
-    - Backend : Spring Boot(3.x.x), Java 17, open JDK 17
-    - Frontend : React 18
-    - Bundling tool : vite
-    - DB & ORM : MariaDB, Spring JPA
-    - Version Control : Git, GitHub
-    - Test : Postman, JUnit5
-    - <del>Deploy : AWS</del>
+## Stacks 📚
+
+#### Environment
+<span>
+    <img src="https://img.shields.io/badge/IntelliJ-000000?style=for-the-badge&logo=IntelliJIDEA&logoColor=white">
+    <img src="https://img.shields.io/badge/Github-181717?style=for-the-badge&logo=Github&logoColor=white">
+    <img src="https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=Git&logoColor=white">
+</span>
+
+#### Package Manager
+<img src="https://img.shields.io/badge/Npm-CB3837?style=for-the-badge&logo=Npm&logoColor=white">
+
+#### Backend
+<span>
+    <img src="https://img.shields.io/badge/Spring Boot-6DB340?style=for-the-badge&logo=SpringBoot&logoColor=white">
+    <img src="https://img.shields.io/badge/Java-007396?style=for-the-badge&logo=openjdk&logoColor=white">
+    <img src="https://img.shields.io/badge/MariaDB-003545?style=for-the-badge&logo=MariaDB&logoColor=white">
+    <img src="https://img.shields.io/badge/Spring Security-6DB340?style=for-the-badge&logo=SpringSecurity&logoColor=white">
+</span>
+
+#### Frontend
+<span>
+    <img src="https://img.shields.io/badge/React-61DBFB?style=for-the-badge&logo=React&logoColor=black">
+    <img src="https://img.shields.io/badge/Javascript-F7DF1E?style=for-the-badge&logo=JavaScript&logoColor=black">
+    <img src="https://img.shields.io/badge/Mui-007FFF?style=for-the-badge&logo=Mui&logoColor=white">
+    <img src="https://img.shields.io/badge/Sass-CC6699?style=for-the-badge&logo=Sass&logoColor=white">
+    <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=Vite&logoColor=white">
+</span>
+
+#### Test
+<span>
+    <img src="https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge&logo=Postman&logoColor=white">
+    <img src="https://img.shields.io/badge/Junit5-25A162?style=for-the-badge&logo=Junit5&logoColor=white">
+</span>
+
+## API Endpoint 📢
+
+  
