@@ -74,21 +74,6 @@ public class ReportService {
       return ReportListResponseDTO.builder().reports(dtoList).build();
   }
 
-  public void deleteReport(String reportId, TokenUserInfo userInfo) {
-
-    Optional<Member> foundMember = memberRepository.findByEmail(userInfo.getEmail());
-
-    foundMember.ifPresent(member -> {
-      if(member.getRole() != Member.Role.ADMIN) {
-        throw new RuntimeException("운영자만 시도할 수 있는 요청입니다.");
-      }
-    });
-
-    Report report = reportRepository.findById(reportId).orElseThrow(() -> new RuntimeException("정보를 찾을 수 없습니다."));
-
-    reportRepository.delete(report);
-  }
-
   public void updateReport(String reportId, TokenUserInfo userInfo) {
     Optional<Member> foundMember = memberRepository.findByEmail(userInfo.getEmail());
 

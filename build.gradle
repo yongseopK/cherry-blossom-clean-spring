@@ -31,8 +31,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.projectreactor:reactor-test'
 
-    implementation 'org.springframework.boot:spring-boot-starter-data-rest'
-//    implementation 'org.springframework.boot:spring-boot-starter-batch'
+//    implementation 'org.springframework.boot:spring-boot-starter-data-rest'
     // 스프링 시큐리티
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
@@ -70,7 +69,6 @@ dependencies {
 
     // API 문서화를 위한 JAVA Swagger 라이브러리
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
-
 }
 
 tasks.named('test') {

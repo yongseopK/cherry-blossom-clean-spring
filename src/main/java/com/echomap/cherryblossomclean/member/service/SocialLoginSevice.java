@@ -39,12 +39,6 @@ public class SocialLoginSevice {
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String googleClientId;
 
-    @Value("${spring.security.oauth2.client.registration.naver.client-id}")
-    private String naverClientId;
-
-    @Value("${spring.security.oauth2.client.provider.naver.authorization-uri}")
-    private String authorizationUri;
-
     @Value("${spring.security.oauth2.client.provider.naver.user-info-uri}")
     private String userInfoUri;
 

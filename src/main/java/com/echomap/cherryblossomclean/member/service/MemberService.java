@@ -18,6 +18,8 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,7 @@ import org.springframework.cglib.core.Local;
 import org.springframework.http.*;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -123,22 +126,6 @@ public class MemberService {
     String token = tokenProvider.createToken(savedMember);
 
     return new MemberModifyResponseDTO(savedMember, token);
-  }
-
-  @Transactional
-  public void delete(TokenUserInfo userInfo, String password) {
-    Member member =
-        memberRepository
-            .findByEmail(userInfo.getEmail())
-            .orElseThrow(() -> new RuntimeException("일치하는 회원정보가 없습니다."));
-
-    String encodedPassword = member.getPassword();
-
-    if (!passwordEncoder.matches(password, encodedPassword)) {
-      throw new RuntimeException("비밀번호가 일치하지 않습니다.");
-    }
-
-    memberRepository.delete(member);
   }
 
   @Transactional(readOnly = true)
@@ -256,7 +243,8 @@ public class MemberService {
   }
 
   public MemberModifyResponseDTO sendTemporaryPassword(String email) {
-    SimpleMailMessage message = new SimpleMailMessage();
+    MimeMessage message = mailSender.createMimeMessage();
+    MimeMessageHelper helper = new MimeMessageHelper(message, "UTF-8");
 
     String temporaryPassword = generateTemporaryPassword();
 
@@ -265,10 +253,28 @@ public class MemberService {
     member.setPassword(passwordEncoder.encode(temporaryPassword));
 
     Member savedMember = memberRepository.save(member);
-    message.setTo(email);
-    message.setSubject("임시 비밀번호");
-    message.setText("깨끗한 꽃놀이의 임시 비밀번호 입니다 : " + temporaryPassword);
-    mailSender.send(message);
+
+    String htmlContent = "<html><body style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; padding: 20px; margin: 0;\">" +
+            "<div style=\"max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 40px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);\">" +
+            "<h1 style=\"color: #6c63ff; text-align: center; margin-bottom: 30px; font-size: 2.0em;\">깨끗한 꽃놀이 임시 비밀번호</h1>" +
+            "<p style=\"font-size: 18px; line-height: 1.6; color: #333;\">안녕하세요,</p>" +
+            "<p style=\"font-size: 18px; line-height: 1.6; color: #333;\">회원님의 임시 비밀번호를 알려드립니다.</p>" +
+            "<div style=\"background-color: #f3f0ff; padding: 20px; border-radius: 5px; margin: 30px 0;\">" +
+            "<p style=\"font-size: 24px; font-weight: bold; color: #6c63ff; text-align: center;\">" + temporaryPassword + "</p>" +
+            "</div>" +
+            "<p style=\"font-size: 18px; line-height: 1.6; color: #333;\">임시 비밀번호를 사용하여 로그인한 후, 반드시 비밀번호를 변경해주시기 바랍니다.</p>" +
+            "<p style=\"font-size: 18px; line-height: 1.6; color: #333; margin: 20px 0px;\">감사합니다.</p>" +
+            "<p style=\"font-size: 18px; line-height: 1.6; color: #333;\">깨끗한 꽃놀이 드림</p>" +
+            "</div></body></html>";
+
+    try {
+      helper.setTo(email);
+      helper.setSubject("깨끗한 꽃놀이 임시 비밀번호 안내");
+      helper.setText(htmlContent, true);
+      mailSender.send(message);
+    } catch (MessagingException e) {
+      throw new RuntimeException("임시 비밀번호 전송에 실패했습니다.", e);
+    }
 
     String token = tokenProvider.createToken(savedMember);
 

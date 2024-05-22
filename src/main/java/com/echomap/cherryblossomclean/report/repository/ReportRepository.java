@@ -16,9 +16,6 @@ import java.util.UUID;
 @Repository
 public interface ReportRepository extends JpaRepository<Report, String> {
 
-    @Query("SELECT r FROM Report r WHERE r.member=?1")
-    List<Report> findAllByMember(Member member);
-
     @Modifying
     @Transactional
     @Query("DELETE FROM Report r WHERE r.status = true AND r.updatedAt < :expirationTime")

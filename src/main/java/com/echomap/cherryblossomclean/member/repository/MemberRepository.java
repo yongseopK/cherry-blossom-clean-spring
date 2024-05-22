@@ -19,11 +19,6 @@ public interface MemberRepository extends JpaRepository<Member, String> {
 
     boolean existsByEmail(String email);
 
-    @Modifying
-    @Transactional
-    @Query("DELETE FROM Member m WHERE m.status = true AND m.updatedAt < :expirationTime")
-    void deleteByStatusTrueAndUpdatedAtBefore(@Param("expirationTime") LocalDateTime expriationTime);
-
     List<Member> findByStatusTrueAndUpdatedAtBefore(LocalDateTime expirationTime);
 
     List<Member> findByIsWithdrawalRequestedTrueAndWithdrawalDateBefore(LocalDateTime expirationTime);

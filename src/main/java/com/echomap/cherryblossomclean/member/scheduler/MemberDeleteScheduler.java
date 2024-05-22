@@ -20,13 +20,11 @@ public class MemberDeleteScheduler {
     private final MemberRepository memberRepository;
     private final ReportRepository reportRepository;
 
-    @Scheduled(cron = "0 */10 * * * *") // 10분 마다 스케쥴러 실행
-    //@Scheduled(fixedRate = 30000)
+    @Scheduled(cron = "0 0 0 * * *") // 10분 마다 스케쥴러 실행
     @Transactional
     public void deleteExpireReports() {
-        log.info("스케쥴러 실행");
+        log.info("강제탈퇴 스케쥴러 동작");
         LocalDateTime expirationTime = LocalDateTime.now().minusHours(24);
-        //LocalDateTime expirationTime = LocalDateTime.now().minusSeconds(30);
         List<Member> expiredMembers = memberRepository.findByStatusTrueAndUpdatedAtBefore(expirationTime);
 
         for (Member member : expiredMembers) {
@@ -34,7 +32,6 @@ public class MemberDeleteScheduler {
 
             memberRepository.delete(member);
         }
-        //memberRepository.deleteByStatusTrueAndUpdatedAtBefore(expirationTime);
     }
 
     @Scheduled(cron = "0 0 0 * * *")
@@ -42,7 +39,7 @@ public class MemberDeleteScheduler {
     public void deleteWithdrawnMembers() {
         LocalDateTime expirationDate = LocalDateTime.now().minusDays(7);
         List<Member> expiredMembers = memberRepository.findByIsWithdrawalRequestedTrueAndWithdrawalDateBefore(expirationDate);
-
+        log.info("회원 탈퇴 스케쥴러 동작");
         for (Member member : expiredMembers) {
             reportRepository.deleteByMember(member);
             memberRepository.delete(member);
