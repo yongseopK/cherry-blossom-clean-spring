@@ -1,6 +1,5 @@
 package com.echomap.cherryblossomclean.auth;
 
-import com.echomap.cherryblossomclean.member.entity.Member;
 import lombok.*;
 
 import static com.echomap.cherryblossomclean.member.entity.Member.*;

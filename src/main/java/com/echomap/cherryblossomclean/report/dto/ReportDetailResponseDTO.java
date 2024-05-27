@@ -4,9 +4,6 @@ import com.echomap.cherryblossomclean.report.entity.Report;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
-
 @Setter
 @Getter
 @ToString

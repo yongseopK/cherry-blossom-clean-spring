@@ -2,7 +2,6 @@ package com.echomap.cherryblossomclean.map.controller;
 
 import com.echomap.cherryblossomclean.map.entity.GarbageCan;
 import com.echomap.cherryblossomclean.map.service.GarbageCanService;
-import com.echomap.cherryblossomclean.member.dto.response.MemberSignUpResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

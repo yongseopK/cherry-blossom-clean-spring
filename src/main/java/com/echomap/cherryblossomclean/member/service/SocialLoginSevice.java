@@ -70,7 +70,7 @@ public class SocialLoginSevice {
                     throw new DuplicateOAuthEmailException("이미 로컬 계정으로 가입된 이메일입니다.");
                 }
 
-                String token = tokenProvider.createToken(member);
+                String token = tokenProvider.createToken(member, false);
                 return new MemberSignInResponseDTO(member, token);
             } else {
                 MemberSignUpRequsetDTO dto =
@@ -83,7 +83,7 @@ public class SocialLoginSevice {
                 Member savedMember =
                         memberRepository.save(dto.toEntity(passwordEncoder, NAVER));
                 log.warn("platform type : {}", savedMember.getPlatformType());
-                String token = tokenProvider.createToken(savedMember);
+                String token = tokenProvider.createToken(savedMember, false);
                 return new MemberSignInResponseDTO(savedMember, token);
             }
         } catch (DuplicateOAuthEmailException e) {
@@ -115,7 +115,7 @@ public class SocialLoginSevice {
                         throw new DuplicateOAuthEmailException("이미 로컬 계정으로 가입된 이메일입니다.");
                     }
 
-                    String token = tokenProvider.createToken(member);
+                    String token = tokenProvider.createToken(member, false);
                     return new MemberSignInResponseDTO(member, token);
                 } else {
                     MemberSignUpRequsetDTO dto =
@@ -127,7 +127,7 @@ public class SocialLoginSevice {
 
                     Member savedMember =
                             memberRepository.save(dto.toEntity(passwordEncoder, GOOGLE));
-                    String token = tokenProvider.createToken(savedMember);
+                    String token = tokenProvider.createToken(savedMember, false);
                     return new MemberSignInResponseDTO(savedMember, token);
                 }
             } else {

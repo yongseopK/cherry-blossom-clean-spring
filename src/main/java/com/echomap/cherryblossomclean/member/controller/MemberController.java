@@ -10,10 +10,8 @@ import com.echomap.cherryblossomclean.member.dto.response.*;
 import com.echomap.cherryblossomclean.member.service.AuthService;
 import com.echomap.cherryblossomclean.member.service.MemberService;
 import com.echomap.cherryblossomclean.member.service.SocialLoginSevice;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -29,9 +27,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import java.nio.charset.StandardCharsets;
-import java.security.SignatureException;
 import java.util.Map;
 
 @Tag(name="회원 관리")
@@ -118,6 +114,11 @@ public class MemberController {
   public ResponseEntity<?> modifyMember(
       @RequestBody MemberModifyRequestDTO requestDTO,
       @AuthenticationPrincipal TokenUserInfo userInfo) {
+
+    if(userInfo == null) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
     try {
       MemberModifyResponseDTO responseDTO = memberService.modify(requestDTO, userInfo);
       return ResponseEntity.ok(responseDTO);
@@ -133,6 +134,10 @@ public class MemberController {
       content = @Content(schema = @Schema(implementation = MemberInfoResponseDTO.class)))
   @GetMapping("/my-info")
   public ResponseEntity<?> getMyInfo(@AuthenticationPrincipal TokenUserInfo userInfo) {
+
+    if(userInfo == null) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
 
     try {
       MemberInfoResponseDTO info = authService.findUserInfo(userInfo);
@@ -153,6 +158,11 @@ public class MemberController {
       content = @Content(schema = @Schema(implementation = MemberListResponseDTO.class)))
   @GetMapping("/admin")
   public ResponseEntity<?> findAllMembers(@AuthenticationPrincipal TokenUserInfo userInfo) {
+
+    if(userInfo == null) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
     try {
       MemberListResponseDTO allMembers = memberService.getAllMembers(userInfo);
       return ResponseEntity.ok().body(allMembers);
@@ -170,6 +180,11 @@ public class MemberController {
   @PatchMapping("/admin/{email}")
   public ResponseEntity<?> deleteMember(
       @PathVariable(name = "email") String email, @AuthenticationPrincipal TokenUserInfo userInfo) {
+
+    if(userInfo == null) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
     try {
       memberService.updateMember(email, userInfo);
       HttpHeaders headers = new HttpHeaders();
@@ -191,6 +206,10 @@ public class MemberController {
   public ResponseEntity<?> changeToRole(
       @AuthenticationPrincipal TokenUserInfo userInfo, @PathVariable(name = "email") String email) {
 
+    if(userInfo == null) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
     try {
       memberService.changeToRole(userInfo, email);
       HttpHeaders headers = new HttpHeaders();
@@ -209,6 +228,11 @@ public class MemberController {
   @ApiResponse(responseCode = "200", description = "탈퇴요청 성공")
   @PostMapping("/withdrawal")
   public ResponseEntity<?> requestWithdrawal(@AuthenticationPrincipal TokenUserInfo userInfo) {
+
+    if(userInfo == null) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
     try {
       memberService.requestWithdrawal(userInfo);
       return ResponseEntity.ok().body("회원탈퇴 요청이 완료되었습니다.");
@@ -245,6 +269,11 @@ public class MemberController {
       content = @Content(schema = @Schema(implementation = Boolean.class)))
   @PostMapping("/token/validate")
   public ResponseEntity<?> validateToken(@AuthenticationPrincipal TokenUserInfo userInfo) {
+
+    if(userInfo == null) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
     try {
       boolean isValid = authService.validateToken(userInfo);
       if (isValid) {

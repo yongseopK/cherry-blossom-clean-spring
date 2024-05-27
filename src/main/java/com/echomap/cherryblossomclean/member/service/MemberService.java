@@ -2,55 +2,25 @@ package com.echomap.cherryblossomclean.member.service;
 
 import com.echomap.cherryblossomclean.auth.TokenProvider;
 import com.echomap.cherryblossomclean.auth.TokenUserInfo;
-import com.echomap.cherryblossomclean.exception.DuplicateOAuthEmailException;
-import com.echomap.cherryblossomclean.exception.ForcedWithdrawalException;
 import com.echomap.cherryblossomclean.exception.ValidateEmailException;
 import com.echomap.cherryblossomclean.member.dto.request.MemberModifyRequestDTO;
 import com.echomap.cherryblossomclean.member.dto.request.MemberSignInRequestDTO;
 import com.echomap.cherryblossomclean.member.dto.request.MemberSignUpRequsetDTO;
 import com.echomap.cherryblossomclean.member.dto.response.*;
 import com.echomap.cherryblossomclean.member.entity.Member;
-import com.echomap.cherryblossomclean.member.entity.Member.PlatformType;
 import com.echomap.cherryblossomclean.member.repository.MemberRepository;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.text.StringEscapeUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cglib.core.Local;
-import org.springframework.http.*;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
-
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
-import java.net.URLEncoder;
-import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
-
-import static com.echomap.cherryblossomclean.member.entity.Member.PlatformType.*;
 
 @Service
 @Slf4j
@@ -123,7 +93,7 @@ public class MemberService {
     log.info("수정된 회원 정보: {}", member);
 
     Member savedMember = memberRepository.save(member);
-    String token = tokenProvider.createToken(savedMember);
+    String token = tokenProvider.createToken(savedMember, false);
 
     return new MemberModifyResponseDTO(savedMember, token);
   }
@@ -201,7 +171,7 @@ public class MemberService {
                 }
 
                 Member save = memberRepository.save(member);
-                tokenProvider.createToken(save);
+                tokenProvider.createToken(save, false);
               });
 
           if (foundMember.isEmpty()) {
@@ -276,7 +246,7 @@ public class MemberService {
       throw new RuntimeException("임시 비밀번호 전송에 실패했습니다.", e);
     }
 
-    String token = tokenProvider.createToken(savedMember);
+    String token = tokenProvider.createToken(savedMember, false);
 
     return new MemberModifyResponseDTO(savedMember, token);
   }

@@ -3,6 +3,7 @@ package com.echomap.cherryblossomclean.filter;
 import com.echomap.cherryblossomclean.auth.TokenProvider;
 import com.echomap.cherryblossomclean.auth.TokenUserInfo;
 import com.echomap.cherryblossomclean.exception.TokenExpiredException;
+import com.echomap.cherryblossomclean.exception.TokenForgedException;
 import com.echomap.cherryblossomclean.exception.TokenInvalidException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -39,7 +40,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     try {
       String token = parseBearerToken(request);
-      //log.info("token : {}", token);
 
       if (token != null) {
         TokenUserInfo userInfo = tokenProvider.validateAndGetTokenUserInfo(token);
@@ -56,17 +56,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
           auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
           SecurityContextHolder.getContext().setAuthentication(auth);
-        } else {
-          log.warn("토큰이 유효하지 않습니다.");
-          response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
         }
       }
     } catch (TokenExpiredException ex) {
-      log.warn("토큰이 만료되었습니다.", ex);
+      log.warn("토큰이 만료되었습니다.");
       response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token expired");
     } catch (TokenInvalidException ex) {
-      log.warn("토큰이 유효하지 않습니다.", ex);
+      log.warn("토큰이 유효하지 않습니다.");
       response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
+    } catch (TokenForgedException ex) {
+      log.warn(ex.getMessage());
+      response.sendError(HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage());
     } catch (Exception ex) {
       log.error("예기치 않은 예외가 발생했습니다.", ex);
       response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An unexpected error occurred");

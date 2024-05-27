@@ -9,8 +9,6 @@ import com.echomap.cherryblossomclean.member.dto.response.MemberInfoResponseDTO;
 import com.echomap.cherryblossomclean.member.dto.response.MemberSignInResponseDTO;
 import com.echomap.cherryblossomclean.member.entity.Member;
 import com.echomap.cherryblossomclean.member.repository.MemberRepository;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;

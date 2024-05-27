@@ -1,14 +1,13 @@
 package com.echomap.cherryblossomclean.auth;
 
+import com.echomap.cherryblossomclean.exception.TokenExpiredException;
+import com.echomap.cherryblossomclean.exception.TokenForgedException;
+import com.echomap.cherryblossomclean.exception.TokenInvalidException;
 import com.echomap.cherryblossomclean.member.entity.Member;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import jakarta.validation.constraints.Null;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -24,34 +23,10 @@ public class TokenProvider {
   @Value("${jwt.secret}")
   private String SECRET_KEY;
 
-  /**
-   * Json Web Token을 생성하는 메서드
-   *
-   * @param memberEntity 토큰의 내용(클레임)에 포함될 유저정보
-   * @return 생성된 json을 암호화한 토큰값
-   */
-  public String createToken(Member memberEntity) {
-
-    Date expiry = Date.from(Instant.now().plus(1, ChronoUnit.DAYS));
-
-    Map<String, Object> claims = new HashMap<>();
-    claims.put("email", memberEntity.getEmail());
-    claims.put("role", memberEntity.getRole());
-
-    return Jwts.builder()
-        .signWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()), SignatureAlgorithm.HS512)
-        .setClaims(claims)
-        .setIssuer("운영자")
-        .setIssuedAt(new Date())
-        .setExpiration(expiry)
-        .setSubject(memberEntity.getEmail())
-        .compact();
-  }
-
   public String createToken(Member memberEntity, boolean autoLogin) {
 
     Date expiry;
-    if(autoLogin) {
+    if (autoLogin) {
       expiry = Date.from(Instant.now().plus(7, ChronoUnit.DAYS));
     } else {
       expiry = Date.from(Instant.now().plus(1, ChronoUnit.DAYS));
@@ -62,33 +37,58 @@ public class TokenProvider {
     claims.put("role", memberEntity.getRole());
 
     return Jwts.builder()
-            .signWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()), SignatureAlgorithm.HS512)
-            .setClaims(claims)
-            .setIssuer("운영자")
-            .setIssuedAt(new Date())
-            .setExpiration(expiry)
-            .setSubject(memberEntity.getEmail())
-            .compact();
+        .signWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()), SignatureAlgorithm.HS512)
+        .setClaims(claims)
+        .setHeaderParam("typ", "JWT")
+        .setIssuer("운영자")
+        .setIssuedAt(new Date())
+        .setExpiration(expiry)
+        .setSubject(memberEntity.getEmail())
+        .compact();
   }
 
-  public TokenUserInfo validateAndGetTokenUserInfo(String token) {
-    Claims claims = Jwts.parserBuilder()
-            .setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()))
-            .build()
-            .parseClaimsJws(token)
-            .getBody();
+  public TokenUserInfo validateAndGetTokenUserInfo(String token) throws TokenExpiredException, TokenInvalidException, TokenForgedException {
+    try {
+      Jws<Claims> claimsJws = Jwts.parserBuilder()
+              .setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()))
+              .build()
+              .parseClaimsJws(token);
 
-    String email = claims.get("email", String.class);
-    String roleString = claims.get("role", String.class);
+      Claims claims = claimsJws.getBody();
 
-    if (email == null || roleString == null) {
-      return null; // 유효하지 않은 토큰인 경우 null 반환
+      // 헤더 검증
+      JwsHeader header = claimsJws.getHeader();
+      if (header == null
+              || !SignatureAlgorithm.HS512.getValue().equals(header.getAlgorithm())
+              || !header.getType().equals("JWT")) {
+        throw new TokenForgedException("헤더가 위조되었습니다.");
+      }
+
+      // 페이로드 검증
+      String email = claims.get("email", String.class);
+      String roleString = claims.get("role", String.class);
+
+      if (email == null || roleString == null) {
+        throw new TokenForgedException("데이터가 위조되었습니다.");
+      }
+
+      try {
+        Member.Role role = Member.Role.valueOf(roleString);
+        return TokenUserInfo.builder()
+                .email(email)
+                .role(role)
+                .build();
+      } catch (IllegalArgumentException ex) {
+        throw new TokenForgedException("데이터가 위조되었습니다.", ex);
+      }
+    } catch (io.jsonwebtoken.security.SignatureException ex) {
+      throw new TokenForgedException("서명이 위조되었습니다.", ex);
+    } catch (MalformedJwtException ex) {
+      throw new TokenInvalidException("Malformed token", ex);
+    } catch (ExpiredJwtException ex) {
+      throw new TokenExpiredException("토큰이 만료되었습니다.", ex);
+    } catch (Exception ex) {
+      throw new TokenInvalidException("Invalid token", ex);
     }
-
-    Member.Role role = Member.Role.valueOf(roleString);
-    return TokenUserInfo.builder()
-            .email(email)
-            .role(role)
-            .build();
   }
 }

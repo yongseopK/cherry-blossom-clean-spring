@@ -1,6 +1,5 @@
 package com.echomap.cherryblossomclean.member.dto.response;
 
-import com.echomap.cherryblossomclean.report.dto.ReportDetailResponseDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
